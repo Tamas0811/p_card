@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="pcards.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1844"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="0" parent="0"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="pcards" custom_title="0" dock_id="1" table="4,6:mainpcards"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000011300ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="Quesion 1*">SELECT FullName, SUM(Amount) AS TotalSpent
+FROM pcards
+WHERE Year = 2014
+GROUP BY FullName
+HAVING TotalSpent &gt; 50000
+ORDER BY TotalSpent DESC;</sql><sql name="Question 2*">SELECT FullName, Month, SUM(Amount) AS TotalSpent
+FROM pcards
+WHERE Year = 2014
+GROUP BY FullName, Month
+HAVING TotalSpent &gt; 10000
+ORDER BY Month ASC, TotalSpent DESC;</sql><sql name="QUestion 3*">SELECT Amount, FullName, Description, Vendor, TransactionDate, PostedDate, MCC
+FROM pcards
+WHERE Year = 2014 AND Amount &gt; 5000
+ORDER BY Amount DESC;</sql><sql name="Question 4*">SELECT t.Amount, t.FullName, t.Description, t.Vendor, t.TransactionDate, t.PostedDate, t.MCC
+FROM pcards t
+INNER JOIN (
+    SELECT FullName, Vendor, TransactionDate
+    FROM pcards
+    WHERE Year = 2014
+    GROUP BY FullName, Vendor, TransactionDate
+    HAVING COUNT(*) &gt; 1 AND SUM(Amount) &gt; 5000
+) sub ON t.FullName = sub.FullName AND t.Vendor = sub.Vendor AND t.TransactionDate = sub.TransactionDate
+WHERE t.Year = 2014
+ORDER BY t.TransactionDate ASC;</sql><sql name="Question 5*">SELECT t.Amount, t.FullName, t.Description, t.Vendor, t.TransactionDate, t.PostedDate, t.MCC
+FROM pcards t
+INNER JOIN (
+    SELECT Vendor, TransactionDate
+    FROM pcards
+    WHERE Year = 2014
+    GROUP BY Vendor, TransactionDate
+    HAVING COUNT(DISTINCT FullName) = 2 AND SUM(Amount) &gt; 5000
+) sub ON t.Vendor = sub.Vendor AND t.TransactionDate = sub.TransactionDate
+WHERE t.Year = 2014
+ORDER BY t.TransactionDate ASC;</sql><sql name="Question 6*">SELECT t.Amount, t.FullName, t.Description, t.Vendor, t.TransactionDate, t.PostedDate, t.MCC
+FROM pcards t
+INNER JOIN (
+    SELECT FullName, TransactionDate
+    FROM pcards
+    WHERE Year = 2014
+    GROUP BY FullName, TransactionDate
+    HAVING COUNT(DISTINCT Vendor) = 2 AND SUM(Amount) &gt; 5000
+) sub ON t.FullName = sub.FullName AND t.TransactionDate = sub.TransactionDate
+WHERE t.Year = 2014
+ORDER BY t.TransactionDate ASC;</sql><sql name="Question 7*">SELECT DISTINCT 
+    t1.Amount, 
+    t1.FullName, 
+    t1.Description, 
+    t1.Vendor, 
+    t1.TransactionDate, 
+    t1.PostedDate, 
+    t1.MCC
+FROM pcards t1
+INNER JOIN pcards t2 
+    ON t1.FullName = t2.FullName 
+    AND t1.TransactionDate = t2.TransactionDate
+WHERE t1.Year = 2014
+  AND (t2.MCC LIKE '%hotel%' OR t2.MCC LIKE '%motel%' OR t2.MCC LIKE '%resort%' OR t2.MCC LIKE '%inn%')
+  AND (t1.MCC LIKE '%food%' OR t1.MCC LIKE '%restaurant%' OR t1.MCC LIKE '%eating%')
+ORDER BY t1.FullName ASC, t1.Amount ASC;</sql><sql name="Question 8*">SELECT FullName, Amount, Vendor, Description, TransactionDate, MCC
+FROM pcards
+WHERE Year = 2014 
+  AND (MCC LIKE '%liquor%' OR Description LIKE '%alcohol%' OR Description LIKE '%wine%' OR Description LIKE '%beer%')
+ORDER BY Amount DESC;</sql><sql name="Question 9*">SELECT FullName, Amount, Vendor, Description, TransactionDate, MCC
+FROM pcards
+WHERE Year = 2014 
+  AND (MCC LIKE '%gas%' OR Vendor LIKE '%fuel%' OR Vendor LIKE '%gas station%' OR Description LIKE '%gasoline%')
+ORDER BY TransactionDate ASC;</sql><sql name="Question 10*">SELECT FullName, Amount, Vendor, Description, TransactionDate
+FROM pcards
+WHERE Year = 2014 AND Description LIKE '%gift card%'
+ORDER BY Amount DESC;</sql><sql name="Question 11*">SELECT FullName, Amount, Vendor, Description, TransactionDate
+FROM pcards
+WHERE Year = 2014 AND Amount BETWEEN 4900 AND 4999.99
+ORDER BY Amount DESC;</sql><sql name="Question 12*">SELECT FullName, Amount, Vendor, Description, TransactionDate
+FROM pcards
+WHERE Year = 2014 AND (Vendor LIKE '%USPS%' OR Vendor LIKE '%POST OFFICE%')
+ORDER BY Amount DESC;</sql><sql name="Question 13*">SELECT FullName, Amount, Vendor, Description, TransactionDate
+FROM pcards
+WHERE Year = 2014 
+  AND strftime('%w', 
+        substr(TransactionDate, 7, 4) || '-' || 
+        printf('%02d', CAST(substr(TransactionDate, 1, instr(TransactionDate, '/') - 1) AS INT)) || '-' || 
+        printf('%02d', CAST(substr(TransactionDate, instr(TransactionDate, '/') + 1, instr(substr(TransactionDate, instr(TransactionDate, '/') + 1), '/') - 1) AS INT))
+      ) IN ('0', '6')
+ORDER BY TransactionDate ASC;</sql><sql name="Question 14*">SELECT FullName, Amount, Vendor, Description, TransactionDate
+FROM pcards
+WHERE Year = 2014 AND (Description LIKE '%membership%' OR Description LIKE '%dues%')
+ORDER BY Amount DESC;</sql><sql name="SQL 16*">SELECT 
+    CAST(SUBSTR(CAST(Amount AS TEXT), 1, 1) AS INT) AS First_Digit,
+    COUNT(*) AS Transaction_Count,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM pcards WHERE Year = 2014 AND Amount &gt;= 1.00), 3) AS Actual_Percentage
+FROM pcards
+WHERE Year = 2014 
+  AND Amount &gt;= 1.00
+GROUP BY First_Digit
+HAVING First_Digit BETWEEN 1 AND 9
+ORDER BY First_Digit ASC;</sql><sql name="SQL 17*">SELECT TransactionDate, Vendor, FullName, Amount
+FROM pcards
+WHERE Year = 2014 
+  AND Amount &gt; 0
+  AND (TransactionDate, Vendor, Amount, FullName) IN (
+      SELECT TransactionDate, Vendor, Amount, FullName
+      FROM pcards
+      WHERE Year = 2014 AND Amount &gt; 0
+      GROUP BY TransactionDate, Vendor, Amount, FullName
+      HAVING COUNT(*) &gt; 1
+  )
+ORDER BY TransactionDate ASC, Vendor ASC;</sql><sql name="SQL 18*">SELECT 
+    FullName, 
+    COUNT(*) AS Duplicate_Occasions
+FROM (
+    SELECT FullName, TransactionDate, Vendor, Amount
+    FROM pcards
+    WHERE Year = 2014 AND Amount &gt; 0
+    GROUP BY FullName, TransactionDate, Vendor, Amount
+    HAVING COUNT(*) &gt; 1
+) AS Duplicate_Groups
+GROUP BY FullName
+ORDER BY Duplicate_Occasions DESC;</sql><sql name="SQL 19*">SELECT Amount, Vendor, Description, FullName
+FROM pcards
+WHERE Year = 2014 
+  AND Amount BETWEEN 1000 AND 9999.99
+  AND CAST(Amount AS INT) % 1000 = 0
+ORDER BY Vendor ASC, FullName ASC;</sql><sql name="SQL 20*">SELECT 
+    t1.FullName, 
+    t1.Vendor, 
+    t1.TransactionDate AS Date1, 
+    t1.Amount AS Amount1, 
+    t2.TransactionDate AS Date2, 
+    t2.Amount AS Amount2,
+    (t1.Amount + t2.Amount) AS Total_Combined_Amount
+FROM pcards t1
+JOIN pcards t2 
+  ON t1.FullName = t2.FullName 
+ AND t1.Vendor = t2.Vendor 
+ AND t1.id &lt; t2.id
+WHERE t1.Year = 2014 AND t2.Year = 2014
+  AND t1.Amount &gt; 0 AND t2.Amount &gt; 0
+  AND (t1.Amount + t2.Amount) &gt; 5000
+ORDER BY Total_Combined_Amount DESC;</sql><sql name="SQL 21*">SELECT FullName, Vendor, Description, Amount, TransactionDate
+FROM pcards
+WHERE Year = 2014 
+  AND Amount &gt; 100
+  AND (
+      Description LIKE '%restaurant%' 
+      OR Description LIKE '%cafe%' 
+      OR Description LIKE '%grill%' 
+      OR Description LIKE '%diner%'
+      OR MCC LIKE '%eating%'
+      OR MCC LIKE '%restaurant%'
+  )
+  AND strftime('%w', 
+        substr(TransactionDate, 7, 4) || '-' || 
+        printf('%02d', CAST(substr(TransactionDate, 1, instr(TransactionDate, '/') - 1) AS INT)) || '-' || 
+        printf('%02d', CAST(substr(TransactionDate, instr(TransactionDate, '/') + 1, instr(substr(TransactionDate, instr(TransactionDate, '/') + 1), '/') - 1) AS INT))
+      ) IN ('0', '6')
+ORDER BY Amount DESC;</sql><sql name="SQL 22*">SELECT FullName, Vendor, Description, Amount, TransactionDate
+FROM pcards
+WHERE Year = 2014 
+  AND Amount &gt;= 500
+  AND (
+      Vendor LIKE '%WALMART%'
+      OR Vendor LIKE '%BEST BUY%'
+      OR Vendor LIKE '%TARGET%'
+      OR Vendor LIKE '%AMAZON%'
+      OR Vendor LIKE '%APPLE%'
+      OR Vendor LIKE '%SAMS CLUB%'
+      OR Vendor LIKE '%COSTCO%'
+  )
+ORDER BY Amount DESC;</sql><sql name="SQL 23*">SELECT 
+    FullName, 
+    COUNT(*) AS Near_Threshold_Count, 
+    SUM(Amount) AS Total_Near_Threshold_Amount
+FROM pcards
+WHERE Year = 2014 
+  AND Amount BETWEEN 4000 AND 4999.99
+GROUP BY FullName
+ORDER BY Near_Threshold_Count DESC, Total_Near_Threshold_Amount DESC;</sql><current_tab id="21"/></tab_sql></sqlb_project>
